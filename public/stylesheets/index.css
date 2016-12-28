@@ -24,3 +24,6 @@
 .user .user-info {
   vertical-align: middle;
 }
+.echart-container {
+  height: 600px;
+}
