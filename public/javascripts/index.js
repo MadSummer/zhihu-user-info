@@ -50,69 +50,55 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 /* 0 */
 /***/function (module, exports, __webpack_require__) {
 
-	__webpack_require__(1);
-	module.exports = __webpack_require__(2);
-
-	/***/
-},
-/* 1 */
-/***/function (module, exports) {
-
 	'use strict';
 
-	module.exports = {
-		baseURL: 'https://www.zhihu.com/autocomplete?token=',
-		query_string: '&max_matches=10',
-		getURL: function getURL(kw) {
-			var key = encodeURI(kw || '');
-			return this.baseURL + key + this.query_string;
-		}
-	};
-
-	/***/
-},
-/* 2 */
-/***/function (module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var Vue = __webpack_require__(3);
-	var config = __webpack_require__(1);
-	Vue.use(__webpack_require__(5));
+	var Vue = __webpack_require__(1);
+	Vue.use(__webpack_require__(3));
 	var vm = new Vue({
 		el: '#app',
 		data: {
 			kw: '',
-			results: []
+			results: [],
+			follows: [],
+			followers: []
 		},
 		methods: {
 			getResult: function getResult(kw) {
+				var _this3 = this;
+
 				this.results = [];
 				var key = encodeURI(this.kw);
-				this.$http.get('/autocomplete/' + key).then(function (res) {
-					var resBody = JSON.parse(res.body);
-
-					if (!resBody instanceof Array) return;
-					resBody[0].forEach(function (res) {
-						if (res[0] === 'people') {
-							res[3].replace('https', 'http');
-							vm.results.push({
-								name: res[1],
-								pic: res[3].replace('https', 'http').replace('_s', '_m'),
-								page: 'https://www.zhihu.com/people/' + res[2],
-								content: res[5]
-							});
-						}
+				this.$http.get('/search/' + key).then(function (res) {
+					res.body.forEach(function (res) {
+						var random = _this3.showImg(res.avatar);
+						res.avatar += '?' + random;
 					});
+					vm.results = res.body;
 				});
 			},
-			getRelationship: function getRelationship() {}
+			showImg: function showImg(url) {
+				// 防盗链处理
+				var frameid = 'frameimg' + Math.random();
+				var random = Math.random();
+				window.img = '<img id="img" src=\'' + url + '?' + random + '\' /><script>window.onload = function(){}<' + '/script>';
+				var ifm = document.createElement('iframe');
+				ifm.id = frameid;
+				ifm.src = 'javascript:parent.img;';
+				ifm.style.display = 'none';
+				document.body.appendChild(ifm);
+				return random;
+			},
+			getRelationship: function getRelationship(userDomain) {
+				this.$http.get('/relationship' + userDomain).then(function (res) {
+					console.log(res);
+				});
+			}
 		}
 	});
 
 	/***/
 },
-/* 3 */
+/* 1 */
 /***/function (module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function (process, global) {
@@ -7954,13 +7940,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		module.exports = Vue$3;
 
 		/* WEBPACK VAR INJECTION */
-	}).call(exports, __webpack_require__(4), function () {
+	}).call(exports, __webpack_require__(2), function () {
 		return this;
 	}());
 
 	/***/
 },
-/* 4 */
+/* 2 */
 /***/function (module, exports) {
 
 	// shim for using process in browser
@@ -8145,7 +8131,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 	/***/
 },
-/* 5 */
+/* 3 */
 /***/function (module, exports) {
 
 	/*!

@@ -2,11 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const https = require('https');
-const config = require('../public/src/js/config');
-router.get('/:kw', (req, res, next) => {
-  const kw = req.params.kw;
-  console.log(config.getURL(kw))
-  https.get(config.getURL(kw), response => {
+router.get('/:userDomain', (req, res, next) => {
+  let userDomain = req.params.userDomain;
+  https.get(userDomain, response => {
     let result = '';
     response.on('data', (chunk) => {
       result += chunk;
