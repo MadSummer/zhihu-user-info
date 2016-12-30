@@ -31,4 +31,8 @@ gulp.task('less',() => {
     .pipe(less())
     .pipe(gulp.dest('./public/stylesheets'));
 })
-gulp.task('default',['less','js']);
+gulp.task('default', ['less', 'js']);
+gulp.task('watch', () => {
+  gulp.watch('./public/src/less/*.less', ['less'])
+  gulp.watch('./public/src/js/*.js', ['js']);
+})

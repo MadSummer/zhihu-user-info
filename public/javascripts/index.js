@@ -58,17 +58,20 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		el: '#app',
 		data: {
 			kw: '',
+			searccOffset: 0,
+			relationshipOffset: 0,
+			limit: 10,
 			results: [],
 			follows: [],
 			followers: []
 		},
 		methods: {
-			getResult: function getResult(kw) {
+			getResult: function getResult(str) {
 				var _this3 = this;
 
 				this.results = [];
-				var key = encodeURI(this.kw);
-				this.$http.get('/search/' + key).then(function (res) {
+				var qs = encodeURI('&kw=' + this.kw + '&offset=' + this.searccOffset + '&limit=' + this.limit + '&type=people');
+				this.$http.get('/search/?' + qs).then(function (res) {
 					res.body.forEach(function (res) {
 						var random = _this3.showImg(res.avatar);
 						res.avatar += '?' + random;
@@ -89,7 +92,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				return random;
 			},
 			getRelationship: function getRelationship(userDomain) {
-				this.$http.get('/relationship' + userDomain).then(function (res) {
+				this.$http.get('/relationship/?userpage=' + userDomain).then(function (res) {
 					console.log(res);
 				});
 			}

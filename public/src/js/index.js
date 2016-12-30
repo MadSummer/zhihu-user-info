@@ -5,15 +5,18 @@ let vm = new Vue({
   el: '#app',
   data: {
     kw: '',
+    searccOffset: 0,
+    relationshipOffset: 0,
+    limit: 10,
     results: [],
     follows: [],
     followers: []
   },
   methods: {
-    getResult: function (kw) {
+    getResult: function (str) {
       this.results = [];
-      let key = encodeURI(this.kw);
-      this.$http.get('/search/' + key)
+      let qs = encodeURI(`&kw=${this.kw}&offset=${this.searccOffset}&limit=${this.limit}&type=people`);
+      this.$http.get('/search/?' + qs)
         .then(res => {
           res.body.forEach((res) => {
             let random = this.showImg(res.avatar);
@@ -35,7 +38,7 @@ let vm = new Vue({
       return random;
     },
     getRelationship: function (userDomain) {
-      this.$http.get('/relationship' + userDomain).then(res => {
+      this.$http.get('/relationship/?userpage=' + userDomain).then(res => {
         console.log(res)
       })
     }
