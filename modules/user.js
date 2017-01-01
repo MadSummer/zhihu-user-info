@@ -5,11 +5,11 @@ class user {
   constructor(info) {
     this.info = info || {};
   }
-  setFollowers(url) {
-    this.info.following = request.getJSON(url);
+  setFollowers(followers) {
+    this.info.following = followers;
   }
-  setFollowees(url) {
-    this.info.followers = request.getJSON(url);
+  setFollowees(followees) {
+    this.info.followers = followees;
   }
 }
 module.exports = user;

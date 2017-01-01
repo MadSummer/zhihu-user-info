@@ -9,7 +9,7 @@ else {
   request = require('http');
 }
 module.exports = {
-  get: url => {
+  get: (url, cb) => {
     request.get(url, res => {
       const statusCode = res.statusCode;
       let error;
@@ -25,10 +25,16 @@ module.exports = {
       res.on('end', () => {
         try {
           let parsedData = JSON.parse(rawData);
-          return parsedData;
+          cb({
+            json: true,
+            data: parsedData
+          });
         } catch (e) {
           console.log(e.message);
-          return rawData;
+          cb({
+            json: false,
+            data: rawData
+          });
         }
       });
     }).on('error', err => {
