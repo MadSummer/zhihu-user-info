@@ -1,30 +1,37 @@
 'use strict';
 const Vue = require('vue');
-const utils = require('../../../modules/utils');
+const utils = require('../../modules/utils');
 Vue.use(require('vue-resource'));
 let vm = new Vue({
   el: '#app',
   data: {
     kw: '',
-    searccOffset: 0,
+    searchOffset: 0,
     relationshipOffset: 0,
     limit: 10,
     results: [],
     echarts: {},
-    echartsReady: false
+    echartsReady: false,
   },
   methods: {
-    getResult: function (str) {
+    getResult: function (s) {
+      if (s === 'search') {
+        this.searchOffset = 0;
+      }
       this.results = [];
-      let qs = encodeURI(`&kw=${this.kw}&offset=${this.searccOffset}&limit=${this.limit}&type=people`);
+      document.querySelectorAll('iframe').forEach(e => {
+        e.parentNode.removeChild(e);
+      })
+      let qs = encodeURI(`&kw=${this.kw}&offset=${this.searchOffset}&limit=${this.limit}&type=people`);
       this.$http.get('/search/?' + qs)
-        .then(res => {
+        .then(res => { 
           if (!res.body.flag) return;
           res.body.data.forEach((res) => {
             let random = this.showImg(res.avatar);
             res.avatar += '?' + random;
           });
           vm.results = res.body.data;
+          vm.searchOffset += 10;
         })
     },
     showImg: function (url) {

@@ -7,16 +7,16 @@ const browserify = require('gulp-browserify');
 const webpack = require('gulp-webpack');
 const less = require('gulp-less');
 gulp.task('less', () => {
-  gulp.src('/public/src/less/*.less')
+  gulp.src('/src/less/*.less')
     .pipe(less())
-    .pipe(gulp.dest('./public/stylesheets'));
+    .pipe(gulp.dest('./stylesheets'));
 })
 gulp.task('js', () => {
-  gulp.src('./public/src/js/*.js')
+  gulp.src('./src/js/*.js')
     /*.pipe(browserify({
       insertGlobals: true,
       debug: !gulp.env.production
-    }))*/
+    }))*/ 
     .pipe(webpack(
       require('./webpack.config')
     ))
@@ -27,12 +27,12 @@ gulp.task('js', () => {
     .pipe(gulp.dest('./public/javascripts'));
 });
 gulp.task('less',() => {
-  gulp.src('./public/src/less/*.less')
+  gulp.src('./src/less/*.less')
     .pipe(less())
     .pipe(gulp.dest('./public/stylesheets'));
 })
 gulp.task('default', ['less', 'js']);
 gulp.task('watch', () => {
-  gulp.watch('./public/src/less/*.less', ['less'])
-  gulp.watch('./public/src/js/*.js', ['js']);
+  gulp.watch('./src/less/*.less', ['less'])
+  gulp.watch('./src/js/*.js', ['js']);
 })

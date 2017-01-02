@@ -59,7 +59,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		el: '#app',
 		data: {
 			kw: '',
-			searccOffset: 0,
+			searchOffset: 0,
 			relationshipOffset: 0,
 			limit: 10,
 			results: [],
@@ -67,11 +67,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			echartsReady: false
 		},
 		methods: {
-			getResult: function getResult(str) {
+			getResult: function getResult(s) {
 				var _this3 = this;
 
+				if (s === 'search') {
+					this.searchOffset = 0;
+				}
 				this.results = [];
-				var qs = encodeURI('&kw=' + this.kw + '&offset=' + this.searccOffset + '&limit=' + this.limit + '&type=people');
+				document.querySelectorAll('iframe').forEach(function (e) {
+					e.parentNode.removeChild(e);
+				});
+				var qs = encodeURI('&kw=' + this.kw + '&offset=' + this.searchOffset + '&limit=' + this.limit + '&type=people');
 				this.$http.get('/search/?' + qs).then(function (res) {
 					if (!res.body.flag) return;
 					res.body.data.forEach(function (res) {
@@ -79,6 +85,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 						res.avatar += '?' + random;
 					});
 					vm.results = res.body.data;
+					vm.searchOffset += 10;
 				});
 			},
 			showImg: function showImg(url) {
