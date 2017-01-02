@@ -53,7 +53,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	'use strict';
 
 	var Vue = __webpack_require__(1);
-	Vue.use(__webpack_require__(3));
+	var utils = __webpack_require__(3);
+	Vue.use(__webpack_require__(4));
 	var vm = new Vue({
 		el: '#app',
 		data: {
@@ -62,8 +63,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			relationshipOffset: 0,
 			limit: 10,
 			results: [],
-			follows: [],
-			followers: []
+			echarts: {},
+			echartsReady: false
 		},
 		methods: {
 			getResult: function getResult(str) {
@@ -72,11 +73,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				this.results = [];
 				var qs = encodeURI('&kw=' + this.kw + '&offset=' + this.searccOffset + '&limit=' + this.limit + '&type=people');
 				this.$http.get('/search/?' + qs).then(function (res) {
-					res.body.forEach(function (res) {
+					if (!res.body.flag) return;
+					res.body.data.forEach(function (res) {
 						var random = _this3.showImg(res.avatar);
 						res.avatar += '?' + random;
 					});
-					vm.results = res.body;
+					vm.results = res.body.data;
 				});
 			},
 			showImg: function showImg(url) {
@@ -91,12 +93,99 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				document.body.appendChild(ifm);
 				return random;
 			},
-			getRelationship: function getRelationship(userDomain) {
-				this.$http.get('/relationship/?userpage=' + userDomain).then(function (res) {
-					console.log(res);
+			analysis: function analysis(userDomain) {
+				this.echartsReady = true;
+				this.$http.get('/analysis/?userpage=' + userDomain).then(function (res) {
+					var hourlegendData = [];
+					for (var x in res.body.activeTime) {
+						hourlegendData.push(x);
+					}
+					var typelegendData = [];
+					for (var _x in res.body.activeType) {
+						typelegendData.push(_x);
+					}
+					hourEcharts.setOption({
+						title: {
+							text: '用户活跃时间',
+							subtext: '\u6570\u636E\u6765\u81EA\u77E5\u4E4E,\u603B\u8BA1\u7EDF\u8BA1' + res.body.active.length + '\u6761',
+							x: 'center'
+						},
+						tooltip: {
+							trigger: 'item',
+							formatter: "{a} <br/>{b} : {c} ({d}%)"
+						},
+						legend: {
+							orient: 'vertical',
+							left: 'left',
+							data: hourlegendData
+						},
+						series: [{
+							name: '活跃时间',
+							type: 'pie',
+							radius: '55%',
+							center: ['50%', '60%'],
+							data: utils.obj2arr(res.body.activeTime),
+							itemStyle: {
+								emphasis: {
+									shadowBlur: 10,
+									shadowOffsetX: 0,
+									shadowColor: 'rgba(0, 0, 0, 0.5)'
+								}
+							}
+						}]
+					});
+					typeEcharts.setOption({
+						title: {
+							text: '用户动态类型',
+							subtext: '\u6570\u636E\u6765\u81EA\u77E5\u4E4E,\u603B\u8BA1\u7EDF\u8BA1' + res.body.active.length + '\u6761',
+							x: 'center'
+						},
+						tooltip: {
+							trigger: 'item',
+							formatter: "{a} <br/>{b} : {c} ({d}%)"
+						},
+						legend: {
+							orient: 'vertical',
+							left: 'left',
+							data: typelegendData
+						},
+						series: [{
+							name: '活跃类型',
+							type: 'pie',
+							radius: '55%',
+							center: ['50%', '60%'],
+							data: utils.obj2arr(res.body.activeType),
+							itemStyle: {
+								emphasis: {
+									shadowBlur: 10,
+									shadowOffsetX: 0,
+									shadowColor: 'rgba(0, 0, 0, 0.5)'
+								}
+							}
+						}]
+					});
 				});
+			},
+			closeEcharts: function closeEcharts() {
+				this.echartsReady = false;
 			}
+		},
+		mounted: function mounted() {
+			// 获取窗口宽度
+			var winWidth = void 0,
+			    winHeight = void 0;
+			if (window.innerWidth) winWidth = window.innerWidth;else if (document.body && document.body.clientWidth) winWidth = document.body.clientWidth;
+			// 获取窗口高度
+			if (window.innerHeight) winHeight = window.innerHeight;else if (document.body && document.body.clientHeight) winHeight = document.body.clientHeight;
+			// 通过深入 Document 内部对 body 进行检测，获取窗口大小
+			if (document.documentElement && document.documentElement.clientHeight && document.documentElement.clientWidth) {
+				winHeight = document.documentElement.clientHeight;
+				winWidth = document.documentElement.clientWidth;
+			}
+			window.typeEcharts = echarts.init(document.querySelector('#type-echarts'));
+			window.hourEcharts = echarts.init(document.querySelector('#hour-echarts'));
 		}
+
 	});
 
 	/***/
@@ -8135,6 +8224,30 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	/***/
 },
 /* 3 */
+/***/function (module, exports) {
+
+	'use strict';
+
+	module.exports = {
+		formatStamp: function formatStamp(stamp) {
+			var hour = new Date(stamp).getHours();
+			return hour;
+		},
+		obj2arr: function obj2arr(obj) {
+			var arr = [];
+			for (var x in obj) {
+				arr.push({
+					name: x,
+					value: obj[x]
+				});
+			}
+			return arr;
+		}
+	};
+
+	/***/
+},
+/* 4 */
 /***/function (module, exports) {
 
 	/*!
