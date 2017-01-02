@@ -102,7 +102,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			},
 			analysis: function analysis(userDomain) {
 				this.echartsReady = true;
+				typeEcharts.showLoading();
+				hourEcharts.showLoading();
+				document.body.style.overflow = 'hidden';
 				this.$http.get('/analysis/?userpage=' + userDomain).then(function (res) {
+					typeEcharts.hideLoading();
+					hourEcharts.hideLoading();
 					var hourlegendData = [];
 					for (var x in res.body.activeTime) {
 						hourlegendData.push(x);
@@ -175,6 +180,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			},
 			closeEcharts: function closeEcharts() {
 				this.echartsReady = false;
+				document.body.style.overflow = 'auto';
 			}
 		},
 		mounted: function mounted() {

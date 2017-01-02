@@ -24,7 +24,7 @@ let vm = new Vue({
       })
       let qs = encodeURI(`&kw=${this.kw}&offset=${this.searchOffset}&limit=${this.limit}&type=people`);
       this.$http.get('/search/?' + qs)
-        .then(res => { 
+        .then(res => {
           if (!res.body.flag) return;
           res.body.data.forEach((res) => {
             let random = this.showImg(res.avatar);
@@ -48,7 +48,12 @@ let vm = new Vue({
     },
     analysis: function (userDomain) {
       this.echartsReady = true;
+      typeEcharts.showLoading();
+      hourEcharts.showLoading();
+      document.body.style.overflow = 'hidden';
       this.$http.get('/analysis/?userpage=' + userDomain).then(res => {
+        typeEcharts.hideLoading();
+        hourEcharts.hideLoading();
         let hourlegendData = [];
         for (let x in res.body.activeTime) {
           hourlegendData.push(x);
@@ -125,6 +130,7 @@ let vm = new Vue({
     },
     closeEcharts: function () {
       this.echartsReady = false;
+      document.body.style.overflow = 'auto';
     }
   },
   mounted: function () {
