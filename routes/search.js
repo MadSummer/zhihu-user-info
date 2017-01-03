@@ -24,6 +24,7 @@ router.get('/', (req, res, next) => {
         data: [],
         flag:false
       };
+      if(err) return res.send(json)
       if (!response.body ||!(response.body.htmls instanceof Array)) return res.send(json);
       response.body.htmls.forEach(user => {
         let $ = cheerio.load(user);
