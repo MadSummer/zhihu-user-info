@@ -6,26 +6,24 @@ const cheerio = require('cheerio');
 const async = require('async');
 const request = require('superagent');
 router.get('/', (req, res, next) => {
-  let kw = req.query.kw;
-  let offset = req.query.offset;
-  let limit = req.query.limit;
-  let type = req.query.type;
+  let query = req.query;
+  let [q, offset, limit, type] = [query.kw, query.offset, query.limit, query.type];
   request
     .get(config.search)
     .set(config.requestHeader)
     .query({
-      q: kw,
-      type: type,
-      limit: limit,
-      offset: offset
+      q,
+      type,
+      limit,
+      offset
     })
     .end((err, response) => {
       let json = {
         data: [],
-        flag:false
+        flag: false
       };
-      if(err) return res.send(json)
-      if (!response.body ||!(response.body.htmls instanceof Array)) return res.send(json);
+      if (err) return res.send(json)
+      if (!response.body || !(response.body.htmls instanceof Array)) return res.send(json);
       response.body.htmls.forEach(user => {
         let $ = cheerio.load(user);
         let userLink = $('.avatar-link');
@@ -42,6 +40,6 @@ router.get('/', (req, res, next) => {
       });
       json.flag = true;
       res.send(json);
-  })
+    })
 })
 module.exports = router;

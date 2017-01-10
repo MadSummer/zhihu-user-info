@@ -9,15 +9,8 @@ class user {
     this.info = {
       total:0,
       active: [],
-      activeTime: {},
-      activeType: {
-        '回答': 0,
-        '赞同回答': 0,
-        '关注问题': 0,
-        '赞同文章': 0,
-        '关注话题': 0,
-        '发布文章': 0
-      }
+      activeTime: new Set(),
+      activeType: new Map(...config.activeType.keys())
     };
   }
   getActives(cb) {
@@ -40,28 +33,8 @@ class user {
           let key = hour + '点'
           self.info.activeTime[key] === undefined ? self.info.activeTime[key] = 1 : self.info.activeTime[key] += 1;
           self.info.active.push(active);
-          switch (active.verb) {
-            case 'ANSWER_CREATE':
-              self.info.activeType['回答'] += 1
-              break;
-            case 'ANSWER_VOTE_UP':
-              self.info.activeType['赞同回答'] += 1
-              break;
-            case 'QUESTION_FOLLOW':
-              self.info.activeType['关注问题'] += 1
-              break;
-            case 'MEMBER_VOTEUP_ARTICLE':
-              self.info.activeType['赞同文章'] += 1
-              break;
-            case 'TOPIC_FOLLOW':
-              self.info.activeType['关注话题'] += 1
-              break;
-            case 'MEMBER_CREATE_ARTICL':
-              self.info.activeType['发布文章'] += 1
-              break;
-            default:
-              break;
-          }
+          let activeKey = config.activeType[active.verb];
+          self.info.activeType[activeKey] === undefined ? self.info.activeType[activeKey] = 1 : self.info.activeTime[activeKey] += 1;
         });
         if (!res.body.paging.is_end && self.info.total < config.max) {
           let url = res.body.paging.next;

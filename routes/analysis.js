@@ -9,9 +9,7 @@ const request = require('superagent');
 router.get('/', (req, res, next) => {
   let userpage = req.query.userpage.replace('/people', '');
   let user = new userClass(userpage);
-  console.time('start')
   user.getActives((user) => {
-    console.timeEnd('start')
     res.send(user.info);
   })
   
