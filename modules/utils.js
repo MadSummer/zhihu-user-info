@@ -10,7 +10,7 @@ module.exports = {
     for (let x in obj) {
       arr.push({
         name: x,
-        value:obj[x]
+        value: obj[x]
       })
     }
     return arr;

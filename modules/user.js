@@ -7,10 +7,10 @@ class user {
   constructor(page) {
     this.page = page || '';
     this.info = {
-      total:0,
+      total: 0,
       active: [],
-      activeTime: new Set(),
-      activeType: new Map(...config.activeType.keys())
+      activeTime: {},
+      activeType: {}
     };
   }
   getActives(cb) {
@@ -30,11 +30,13 @@ class user {
         res.body.data.forEach((active) => {
           self.info.total += 1;
           let hour = utils.formatStamp(active.created_time * 1000) + '';
-          let key = hour + '点'
-          self.info.activeTime[key] === undefined ? self.info.activeTime[key] = 1 : self.info.activeTime[key] += 1;
+          let k = hour + '点';
+          let v = self.info.activeTime[k] !== undefined ? self.info.activeTime[k] + 1 : 1;
+          self.info.activeTime[k] = v;
           self.info.active.push(active);
-          let activeKey = config.activeType[active.verb];
-          self.info.activeType[activeKey] === undefined ? self.info.activeType[activeKey] = 1 : self.info.activeTime[activeKey] += 1;
+          let k1 = config.activeType.get(active.verb);
+          let v1 = self.info.activeType[k1]  !== undefined ? self.info.activeType[k1] + 1 : 1;
+          self.info.activeType[k1] = v1 ;
         });
         if (!res.body.paging.is_end && self.info.total < config.max) {
           let url = res.body.paging.next;
